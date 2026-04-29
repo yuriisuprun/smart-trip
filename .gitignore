@@ -171,6 +171,18 @@ temp/
 *.iml
 .idea/
 
+# Gradle (not used in this project)
+.gradle/
+build/
+gradle/
+gradlew
+gradlew.bat
+gradle.properties
+settings.gradle
+settings.gradle.kts
+build.gradle
+build.gradle.kts
+
 # Sublime Text
 *.sublime-project
 *.sublime-workspace

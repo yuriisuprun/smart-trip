@@ -1,7 +1,7 @@
 """
 User model
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, String, DateTime, Float, Integer, JSON
 from sqlalchemy.orm import relationship
 from app.core.database import Base
@@ -19,8 +19,8 @@ class User(Base):
     total_score = Column(Float, default=0.0)
     total_questions = Column(Integer, default=0)
     weak_areas = Column(JSON, default={})  # {"grammar": 0.5, "vocabulary": 0.6}
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Relationships
     sessions = relationship("ChatSession", back_populates="user", cascade="all, delete-orphan")

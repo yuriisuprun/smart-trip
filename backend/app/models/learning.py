@@ -1,7 +1,7 @@
 """
 Learning progress and mistake tracking models
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, String, DateTime, Text, ForeignKey, Float, Integer, JSON
 from sqlalchemy.orm import relationship
 from app.core.database import Base
@@ -20,8 +20,8 @@ class Mistake(Base):
     correct_answer = Column(Text)
     explanation = Column(Text)
     frequency = Column(Integer, default=1)  # How many times this mistake occurred
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Relationships
     user = relationship("User", back_populates="mistakes")
@@ -43,8 +43,8 @@ class SkillProgress(Base):
     attempts = Column(Integer, default=0)
     correct_answers = Column(Integer, default=0)
     last_practiced = Column(DateTime)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # Relationships
     user = relationship("User", back_populates="skill_progress")
@@ -67,7 +67,7 @@ class QuizAttempt(Base):
     score = Column(Float)  # 0-10
     feedback = Column(Text)
     time_spent = Column(Integer)  # seconds
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     # Relationships
     user = relationship("User", back_populates="quiz_attempts")

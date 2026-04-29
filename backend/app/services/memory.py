@@ -3,7 +3,7 @@ Memory management service for short-term and long-term learning
 """
 import logging
 from typing import List, Dict, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 from app.models import ChatMessage, Mistake, SkillProgress, User
 from app.core.config import settings
@@ -49,7 +49,7 @@ class MemoryService:
             self.db.query(Mistake)
             .filter(
                 Mistake.user_id == user_id,
-                Mistake.created_at >= datetime.utcnow() - timedelta(days=30),
+                Mistake.created_at >= datetime.now(timezone.utc) - timedelta(days=30),
             )
             .order_by(Mistake.frequency.desc())
             .limit(10)
@@ -111,12 +111,12 @@ class MemoryService:
 
         if existing:
             existing.frequency += 1
-            existing.updated_at = datetime.utcnow()
+            existing.updated_at = datetime.now(timezone.utc)
             self.db.commit()
             return existing
 
         mistake = Mistake(
-            id=f"mistake_{user_id}_{datetime.utcnow().timestamp()}",
+            id=f"mistake_{user_id}_{datetime.now(timezone.utc).timestamp()}",
             user_id=user_id,
             topic=topic,
             mistake_type=mistake_type,
@@ -147,7 +147,7 @@ class MemoryService:
 
         if not progress:
             progress = SkillProgress(
-                id=f"skill_{user_id}_{skill}_{datetime.utcnow().timestamp()}",
+                id=f"skill_{user_id}_{skill}_{datetime.now(timezone.utc).timestamp()}",
                 user_id=user_id,
                 skill=skill,
             )
@@ -159,7 +159,7 @@ class MemoryService:
 
         # Update score (weighted average)
         progress.score = (progress.score * (progress.attempts - 1) + score) / progress.attempts
-        progress.last_practiced = datetime.utcnow()
+        progress.last_practiced = datetime.now(timezone.utc)
 
         # Update CEFR level based on score
         if progress.score >= 80:

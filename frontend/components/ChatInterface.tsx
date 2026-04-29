@@ -5,7 +5,8 @@ import { useAuth } from '@/lib/auth-wrapper'
 import { useChatStore, Message } from '@/lib/store'
 import { getTranslations } from '@/lib/i18n'
 import { chatAPI } from '@/lib/api'
-import { Send, Loader } from 'lucide-react'
+import { Send, Loader, Settings } from 'lucide-react'
+import AdminPanel from './AdminPanel'
 
 export default function ChatInterface() {
   const [input, setInput] = useState('')
@@ -15,6 +16,8 @@ export default function ChatInterface() {
   const { currentSession, addMessage, language } = useChatStore()
   const { getToken } = useAuth()
   const t = getTranslations(language)
+
+  const [showAdminPanel, setShowAdminPanel] = useState(false)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -129,6 +132,38 @@ export default function ChatInterface() {
       flexDirection: 'column', 
       height: '100%' 
     }}>
+      {/* Header with Admin Button */}
+      <div style={{
+        padding: '1rem',
+        borderBottom: '1px solid #e2e8f0',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: '#f8fafc'
+      }}>
+        <h3 style={{ margin: 0, color: '#1e293b', fontSize: '1.125rem', fontWeight: '600' }}>
+          Italian Grammar Tutor
+        </h3>
+        <button
+          onClick={() => setShowAdminPanel(true)}
+          style={{
+            padding: '0.5rem',
+            backgroundColor: '#4f46e5',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            fontSize: '0.875rem'
+          }}
+        >
+          <Settings size={16} />
+          Admin
+        </button>
+      </div>
+
       {/* Messages */}
       <div style={{ 
         flex: 1, 
@@ -160,7 +195,8 @@ export default function ChatInterface() {
               <p style={{ 
                 fontSize: '0.875rem', 
                 lineHeight: '1.4',
-                margin: 0
+                margin: 0,
+                whiteSpace: 'pre-wrap'
               }}>
                 {message.content}
               </p>
@@ -254,6 +290,11 @@ export default function ChatInterface() {
           <Send size={16} />
         </button>
       </form>
+
+      {/* Admin Panel Modal */}
+      {showAdminPanel && (
+        <AdminPanel onClose={() => setShowAdminPanel(false)} />
+      )}
     </div>
   )
 }

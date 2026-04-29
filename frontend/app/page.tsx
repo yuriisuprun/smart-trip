@@ -8,6 +8,7 @@ import ChatInterface from '@/components/ChatInterface'
 import ProgressDashboard from '@/components/ProgressDashboard'
 import QuizInterface from '@/components/QuizInterface'
 import LanguageSelector from '@/components/LanguageSelector'
+import SimpleAdminTest from '@/components/SimpleAdminTest'
 import { BookOpen, BarChart3, HelpCircle, Plus, User } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -238,6 +239,7 @@ export default function Home() {
       </SignedOut>
 
       <SignedIn>
+        <SimpleAdminTest />
         <div style={{ 
           maxWidth: '1200px', 
           margin: '0 auto', 

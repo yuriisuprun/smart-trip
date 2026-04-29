@@ -114,6 +114,32 @@ export const adminAPI = {
     const response = await api.post('/api/admin/seed-all')
     return response.data
   },
+
+  // New comprehensive content seeding endpoints
+  async seedComprehensiveContent() {
+    const response = await api.post('/api/admin/seed-comprehensive-content')
+    return response.data
+  },
+
+  async seedByCefrLevel(level: string) {
+    const response = await api.post(`/api/admin/seed-by-cefr-level/${level}`)
+    return response.data
+  },
+
+  async seedByTopic(topic: string) {
+    const response = await api.post(`/api/admin/seed-by-topic/${topic}`)
+    return response.data
+  },
+
+  async updateContentVersion(version: string) {
+    const response = await api.post(`/api/admin/update-content-version/${version}`)
+    return response.data
+  },
+
+  async getContentStatistics() {
+    const response = await api.get('/api/admin/content-statistics')
+    return response.data
+  },
 }
 
 export { api }

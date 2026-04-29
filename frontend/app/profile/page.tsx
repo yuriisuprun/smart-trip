@@ -1,8 +1,8 @@
 'use client'
 
-import { useUser, UserButton } from '@clerk/nextjs'
+import { useUser, UserButton, useAuth } from '@clerk/nextjs'
 import { useState, useEffect } from 'react'
-import { api } from '@/lib/api'
+import { createAuthenticatedApi } from '@/lib/api'
 
 interface UserProfile {
   id: string
@@ -17,6 +17,7 @@ interface UserProfile {
 
 export default function ProfilePage() {
   const { user, isLoaded } = useUser()
+  const { getToken } = useAuth()
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -35,6 +36,7 @@ export default function ProfilePage() {
   const fetchProfile = async () => {
     try {
       setLoading(true)
+      const api = createAuthenticatedApi(getToken)
       const response = await api.get('/api/user/profile')
       setProfile(response.data)
       setEditForm({
@@ -51,6 +53,7 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     try {
+      const api = createAuthenticatedApi(getToken)
       const response = await api.put('/api/user/profile', editForm)
       setProfile(response.data)
       setEditing(false)

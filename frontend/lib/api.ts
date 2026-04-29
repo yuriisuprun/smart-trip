@@ -1,31 +1,13 @@
 import axios from 'axios'
-import { auth } from '@clerk/nextjs/server'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
-// Create axios instance
+// Create axios instance for client-side use
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-})
-
-// Add auth interceptor for server-side requests
-api.interceptors.request.use(async (config) => {
-  // For server-side requests, get token from Clerk
-  if (typeof window === 'undefined') {
-    try {
-      const { getToken } = auth()
-      const token = await getToken()
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`
-      }
-    } catch (error) {
-      console.error('Error getting auth token:', error)
-    }
-  }
-  return config
 })
 
 // Client-side API helper that includes auth token

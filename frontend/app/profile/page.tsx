@@ -2,7 +2,7 @@
 
 import { useUser, UserButton } from '@clerk/nextjs'
 import { useState, useEffect } from 'react'
-import { api } from '../lib/api'
+import { api } from '@/lib/api'
 
 interface UserProfile {
   id: string

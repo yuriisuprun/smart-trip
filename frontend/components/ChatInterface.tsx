@@ -12,7 +12,7 @@ export default function ChatInterface() {
   const [isStreaming, setIsStreaming] = useState(false)
   const [mounted, setMounted] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const { currentSession, addMessage, isLoading, language } = useChatStore()
+  const { currentSession, addMessage, language } = useChatStore()
   const { getToken } = useAuth()
   const t = getTranslations(language)
 

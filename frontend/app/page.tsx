@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs'
-import { useChatStore, ChatSession, Message } from '@/lib/store'
+import { useChatStore, ChatSession } from '@/lib/store'
 import { getTranslations, formatDifficultyLevel } from '@/lib/i18n'
 import ChatInterface from '@/components/ChatInterface'
 import ProgressDashboard from '@/components/ProgressDashboard'

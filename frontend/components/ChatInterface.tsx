@@ -1,22 +1,11 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
+import { useAuth } from '@/lib/auth-wrapper'
 import { useChatStore, Message } from '@/lib/store'
 import { getTranslations } from '@/lib/i18n'
 import { chatAPI } from '@/lib/api'
 import { Send, Loader } from 'lucide-react'
-
-// Conditional imports based on Clerk configuration
-const isClerkConfigured = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-
-let useAuth
-if (isClerkConfigured) {
-  const clerk = require('@clerk/nextjs')
-  useAuth = clerk.useAuth
-} else {
-  const mock = require('@/lib/auth-mock')
-  useAuth = mock.mockUseAuth
-}
 
 export default function ChatInterface() {
   const [input, setInput] = useState('')

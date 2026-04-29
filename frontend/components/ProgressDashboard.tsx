@@ -1,21 +1,10 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { useAuth } from '@/lib/auth-wrapper'
 import { progressAPI } from '@/lib/api'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { TrendingUp } from 'lucide-react'
-
-// Conditional imports based on Clerk configuration
-const isClerkConfigured = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-
-let useAuth
-if (isClerkConfigured) {
-  const clerk = require('@clerk/nextjs')
-  useAuth = clerk.useAuth
-} else {
-  const mock = require('@/lib/auth-mock')
-  useAuth = mock.mockUseAuth
-}
 
 interface SkillData {
   skill: string

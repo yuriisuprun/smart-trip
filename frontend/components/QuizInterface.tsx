@@ -1,20 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { useAuth } from '@/lib/auth-wrapper'
 import { evaluateAPI } from '@/lib/api'
 import { CheckCircle, XCircle, Loader } from 'lucide-react'
-
-// Conditional imports based on Clerk configuration
-const isClerkConfigured = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-
-let useAuth
-if (isClerkConfigured) {
-  const clerk = require('@clerk/nextjs')
-  useAuth = clerk.useAuth
-} else {
-  const mock = require('@/lib/auth-mock')
-  useAuth = mock.mockUseAuth
-}
 
 interface QuizQuestion {
   id: string

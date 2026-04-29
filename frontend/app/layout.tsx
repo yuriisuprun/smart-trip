@@ -1,11 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
-// Conditional Clerk import based on environment
-const ClerkProvider = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY 
-  ? require('@clerk/nextjs').ClerkProvider 
-  : ({ children }: { children: React.ReactNode }) => <>{children}</>;
-
 export const metadata: Metadata = {
   title: 'Italian Language AI Tutor',
   description: 'Context-aware AI tutoring system for Italian language exam preparation',
@@ -34,17 +29,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body style={{ 
-          backgroundColor: '#f8fafc', 
-          minHeight: '100vh',
-          margin: 0,
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif'
-        }}>
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body style={{ 
+        backgroundColor: '#f8fafc', 
+        minHeight: '100vh',
+        margin: 0,
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif'
+      }}>
+        {children}
+      </body>
+    </html>
   )
 }

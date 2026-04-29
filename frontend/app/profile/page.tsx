@@ -1,8 +1,23 @@
 'use client'
 
-import { useUser, UserButton, useAuth } from '@clerk/nextjs'
 import { useState, useEffect } from 'react'
 import { createAuthenticatedApi } from '@/lib/api'
+
+// Conditional imports based on Clerk configuration
+const isClerkConfigured = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+
+let useUser, UserButton, useAuth
+if (isClerkConfigured) {
+  const clerk = require('@clerk/nextjs')
+  useUser = clerk.useUser
+  UserButton = clerk.UserButton
+  useAuth = clerk.useAuth
+} else {
+  const mock = require('@/lib/auth-mock')
+  useUser = mock.mockUseUser
+  UserButton = mock.MockUserButton
+  useAuth = mock.mockUseAuth
+}
 
 interface UserProfile {
   id: string

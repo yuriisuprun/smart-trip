@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs'
 import { useChatStore, ChatSession } from '@/lib/store'
 import { getTranslations, formatDifficultyLevel } from '@/lib/i18n'
 import ChatInterface from '@/components/ChatInterface'
@@ -10,6 +9,26 @@ import QuizInterface from '@/components/QuizInterface'
 import LanguageSelector from '@/components/LanguageSelector'
 import { BookOpen, BarChart3, HelpCircle, Plus, User } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
+
+// Conditional imports based on Clerk configuration
+const isClerkConfigured = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+
+let SignedIn, SignedOut, SignInButton, UserButton, useUser
+if (isClerkConfigured) {
+  const clerk = require('@clerk/nextjs')
+  SignedIn = clerk.SignedIn
+  SignedOut = clerk.SignedOut
+  SignInButton = clerk.SignInButton
+  UserButton = clerk.UserButton
+  useUser = clerk.useUser
+} else {
+  const mock = require('@/lib/auth-mock')
+  SignedIn = mock.MockSignedIn
+  SignedOut = mock.MockSignedOut
+  SignInButton = mock.MockSignInButton
+  UserButton = mock.MockUserButton
+  useUser = mock.mockUseUser
+}
 
 type TabType = 'chat' | 'quiz' | 'progress'
 

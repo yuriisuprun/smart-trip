@@ -63,11 +63,25 @@ async def chat(
         short_term = memory_service.get_short_term_memory(request.session_id)
         long_term = memory_service.get_long_term_memory(current_user_id)  # Use authenticated user ID
 
-        # Retrieve relevant context from RAG
-        retrieved = rag_service.retrieve(
+        # Retrieve relevant context from RAG with enhanced filtering
+        user = db.query(User).filter(User.id == current_user_id).first()
+        user_cefr_level = user.cefr_level if user else "A2"
+        
+        # Get grammar-specific content based on user's level and topic
+        retrieved = rag_service.retrieve_grammar_content(
             query=request.message,
+            cefr_level=user_cefr_level,
+            topic=request.topic if request.topic != "general" else None,
             top_k=5,
         )
+        
+        # If no grammar content found, try general retrieval
+        if not retrieved:
+            retrieved = rag_service.retrieve(
+                query=request.message,
+                top_k=5,
+                cefr_level=user_cefr_level
+            )
 
         # Generate response using language-aware LLM service
         async def generate():

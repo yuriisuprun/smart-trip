@@ -82,16 +82,60 @@ class RAGService:
         query: str,
         top_k: int = 5,
         filters: Optional[dict] = None,
+        cefr_level: Optional[str] = None,
+        content_type: Optional[str] = None,
+        topic: Optional[str] = None,
     ) -> List[dict]:
-        """Retrieve relevant documents"""
+        """Retrieve relevant documents with enhanced filtering"""
         try:
             query_embedding = self.embeddings.embed_query(query)
 
-            results = self.client.search(
-                collection_name=self.collection_name,
-                query_vector=query_embedding,
-                limit=top_k,
-            )
+            # Build filter conditions
+            filter_conditions = []
+            
+            if cefr_level:
+                filter_conditions.append({
+                    "key": "cefr_level",
+                    "match": {"value": cefr_level}
+                })
+            
+            if content_type:
+                filter_conditions.append({
+                    "key": "content_type", 
+                    "match": {"value": content_type}
+                })
+                
+            if topic:
+                filter_conditions.append({
+                    "key": "subtopic",
+                    "match": {"value": topic}
+                })
+            
+            # Add custom filters if provided
+            if filters:
+                for key, value in filters.items():
+                    filter_conditions.append({
+                        "key": key,
+                        "match": {"value": value}
+                    })
+
+            # Prepare search parameters
+            search_params = {
+                "collection_name": self.collection_name,
+                "query_vector": query_embedding,
+                "limit": top_k,
+            }
+            
+            # Add filter if conditions exist
+            if filter_conditions:
+                if len(filter_conditions) == 1:
+                    search_params["query_filter"] = filter_conditions[0]
+                else:
+                    search_params["query_filter"] = {
+                        "must": filter_conditions
+                    }
+
+            results = self.client.search(**search_params)
 
             retrieved = []
             for result in results:
@@ -110,6 +154,77 @@ class RAGService:
             logger.error(f"Error retrieving documents: {e}")
             return []
 
+    def retrieve_by_cefr_level(
+        self,
+        query: str,
+        cefr_level: str,
+        top_k: int = 5,
+    ) -> List[dict]:
+        """Retrieve documents filtered by CEFR level"""
+        return self.retrieve(
+            query=query,
+            top_k=top_k,
+            cefr_level=cefr_level
+        )
+    
+    def retrieve_grammar_content(
+        self,
+        query: str,
+        cefr_level: Optional[str] = None,
+        topic: Optional[str] = None,
+        top_k: int = 5,
+    ) -> List[dict]:
+        """Retrieve grammar-specific content"""
+        return self.retrieve(
+            query=query,
+            top_k=top_k,
+            cefr_level=cefr_level,
+            content_type="grammar_rule",
+            topic=topic
+        )
+    
+    def retrieve_exercises(
+        self,
+        query: str,
+        cefr_level: Optional[str] = None,
+        exercise_type: Optional[str] = None,
+        top_k: int = 3,
+    ) -> List[dict]:
+        """Retrieve exercise content"""
+        filters = {}
+        if exercise_type:
+            filters["exercise_type"] = exercise_type
+            
+        return self.retrieve(
+            query=query,
+            top_k=top_k,
+            cefr_level=cefr_level,
+            content_type="exercise",
+            filters=filters
+        )
+    
+    def get_content_by_difficulty(
+        self,
+        query: str,
+        min_difficulty: int,
+        max_difficulty: int = 10,
+        top_k: int = 5,
+    ) -> List[dict]:
+        """Retrieve content filtered by difficulty range"""
+        # Note: This would require a range filter in Qdrant
+        # For now, we'll retrieve and filter in Python
+        results = self.retrieve(query=query, top_k=top_k * 2)
+        
+        filtered_results = []
+        for result in results:
+            difficulty = result["metadata"].get("difficulty", 5)
+            if min_difficulty <= difficulty <= max_difficulty:
+                filtered_results.append(result)
+                if len(filtered_results) >= top_k:
+                    break
+        
+        return filtered_results
+    
     def _chunk_text(self, text: str, chunk_size: int = 500) -> List[str]:
         """Split text into chunks"""
         chunks = []

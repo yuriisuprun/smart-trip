@@ -7,11 +7,189 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.services.rag import rag_service
+from app.services.content_seeder import content_seeder
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-# Sample Italian grammar content
+
+@router.post("/seed-comprehensive-content")
+async def seed_comprehensive_content():
+    """Seed comprehensive B1-B2 Italian grammar content (500+ rules)"""
+    try:
+        logger.info("Starting comprehensive content seeding...")
+        results = content_seeder.seed_comprehensive_grammar_content()
+        
+        return {
+            "message": "Comprehensive Italian grammar content seeded successfully",
+            "results": results
+        }
+    except Exception as e:
+        logger.error(f"Error seeding comprehensive content: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/seed-by-cefr-level/{cefr_level}")
+async def seed_by_cefr_level(cefr_level: str):
+    """Seed content filtered by CEFR level (A1, A2, B1, B2, C1, C2)"""
+    try:
+        valid_levels = ["A1", "A2", "B1", "B2", "C1", "C2"]
+        if cefr_level not in valid_levels:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Invalid CEFR level. Must be one of: {valid_levels}"
+            )
+        
+        logger.info(f"Seeding content for CEFR level: {cefr_level}")
+        results = content_seeder.seed_by_cefr_level(cefr_level)
+        
+        return {
+            "message": f"Content for CEFR level {cefr_level} seeded successfully",
+            "results": results
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error seeding CEFR {cefr_level} content: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/seed-by-topic/{topic}")
+async def seed_by_topic(topic: str):
+    """Seed content filtered by grammar topic"""
+    try:
+        logger.info(f"Seeding content for topic: {topic}")
+        results = content_seeder.seed_by_topic(topic)
+        
+        return {
+            "message": f"Content for topic '{topic}' seeded successfully",
+            "results": results
+        }
+    except Exception as e:
+        logger.error(f"Error seeding topic {topic} content: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/update-content-version/{version}")
+async def update_content_version(version: str):
+    """Update content version and re-seed all content"""
+    try:
+        logger.info(f"Updating content version to: {version}")
+        results = content_seeder.update_content_version(version)
+        
+        return {
+            "message": f"Content version updated to {version} and re-seeded successfully",
+            "results": results
+        }
+    except Exception as e:
+        logger.error(f"Error updating content version: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/content-statistics")
+async def get_content_statistics():
+    """Get statistics about the seeded content"""
+    try:
+        stats = content_seeder.get_content_statistics()
+        return {
+            "message": "Content statistics retrieved successfully",
+            "statistics": stats
+        }
+    except Exception as e:
+        logger.error(f"Error getting content statistics: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Legacy endpoints for backward compatibility
+@router.post("/seed-content")
+async def seed_basic_content():
+    """Legacy endpoint - now redirects to comprehensive content seeding"""
+    return await seed_comprehensive_content()
+
+
+@router.post("/seed-exams")
+async def seed_exam_content():
+    """Seed exam-specific content (exercises and quizzes)"""
+    try:
+        logger.info("Seeding exam content...")
+        
+        # Import here to avoid circular imports
+        import sys
+        import os
+        sys.path.append(os.path.join(os.path.dirname(__file__), '../../../content'))
+        
+        from italian_exercises_b1_b2 import italian_grammar_exercises
+        
+        # Seed only exercises from the comprehensive content
+        results = {
+            "exercises": 0,
+            "total_documents": 0,
+            "errors": []
+        }
+        
+        exercises = italian_grammar_exercises.get_all_exercises()
+        
+        for doc_id, exercise_data in exercises.items():
+            try:
+                rag_service.add_document(
+                    doc_id=f"exam_{doc_id}",
+                    content=exercise_data["content"],
+                    metadata={
+                        **exercise_data["metadata"],
+                        "content_version": content_seeder.content_version,
+                        "last_updated": content_seeder.last_updated,
+                        "content_type": "exam_exercise",
+                        "language": "italian",
+                        "source": "exam_content"
+                    }
+                )
+                results["exercises"] += 1
+            except Exception as e:
+                logger.error(f"Error seeding exam exercise {doc_id}: {e}")
+                results["errors"].append(f"Exam {doc_id}: {str(e)}")
+        
+        results["total_documents"] = results["exercises"]
+        
+        return {
+            "message": "Exam content seeded successfully",
+            "results": results
+        }
+    except Exception as e:
+        logger.error(f"Error seeding exam content: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/seed-all")
+async def seed_all_content():
+    """Seed all available content (comprehensive + exams)"""
+    try:
+        logger.info("Seeding all content...")
+        
+        # Seed comprehensive content
+        comprehensive_results = content_seeder.seed_comprehensive_grammar_content()
+        
+        # Seed additional exam content
+        exam_response = await seed_exam_content()
+        exam_results = exam_response["results"]
+        
+        # Combine results
+        total_results = {
+            "grammar_content": comprehensive_results["grammar_content"],
+            "exercises": comprehensive_results["exercises"] + exam_results["exercises"],
+            "total_documents": comprehensive_results["total_documents"] + exam_results["total_documents"],
+            "errors": comprehensive_results["errors"] + exam_results["errors"]
+        }
+        
+        return {
+            "message": "All content seeded successfully",
+            "results": total_results
+        }
+    except Exception as e:
+        logger.error(f"Error seeding all content: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Legacy content for backward compatibility
 GRAMMAR_CONTENT = {
     "present_tense": {
         "content": """
@@ -167,75 +345,3 @@ EXAM_QUESTIONS = {
         },
     },
 }
-
-
-@router.post("/seed-content")
-async def seed_grammar_content(db: Session = Depends(get_db)):
-    """Seed Italian grammar content into vector DB"""
-    try:
-        for doc_id, doc_data in GRAMMAR_CONTENT.items():
-            rag_service.add_document(
-                doc_id=doc_id,
-                content=doc_data["content"],
-                metadata=doc_data["metadata"],
-            )
-
-        return {
-            "status": "success",
-            "message": f"Seeded {len(GRAMMAR_CONTENT)} grammar documents",
-        }
-
-    except Exception as e:
-        logger.error(f"Error seeding content: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.post("/seed-exams")
-async def seed_exam_questions(db: Session = Depends(get_db)):
-    """Seed exam questions into vector DB"""
-    try:
-        for doc_id, doc_data in EXAM_QUESTIONS.items():
-            rag_service.add_document(
-                doc_id=doc_id,
-                content=doc_data["content"],
-                metadata=doc_data["metadata"],
-            )
-
-        return {
-            "status": "success",
-            "message": f"Seeded {len(EXAM_QUESTIONS)} exam questions",
-        }
-
-    except Exception as e:
-        logger.error(f"Error seeding exams: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.post("/seed-all")
-async def seed_all_content(db: Session = Depends(get_db)):
-    """Seed all content"""
-    try:
-        # Seed grammar
-        for doc_id, doc_data in GRAMMAR_CONTENT.items():
-            rag_service.add_document(
-                doc_id=doc_id,
-                content=doc_data["content"],
-                metadata=doc_data["metadata"],
-            )
-
-        # Seed exams
-        for doc_id, doc_data in EXAM_QUESTIONS.items():
-            rag_service.add_document(
-                doc_id=doc_id,
-                content=doc_data["content"],
-                metadata=doc_data["metadata"],
-            )
-
-        return {
-            "status": "success",
-            "message": f"Seeded {len(GRAMMAR_CONTENT) + len(EXAM_QUESTIONS)} documents",
-        }
-
-    except Exception as e:
-        logger.error(f"Error seeding all content: {e}")
-        raise HTTPException(status_code=500, detail=str(e))

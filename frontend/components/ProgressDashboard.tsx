@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { useAuth } from '@clerk/nextjs'
 import { progressAPI } from '@/lib/api'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { TrendingUp } from 'lucide-react'
@@ -17,6 +18,7 @@ export default function ProgressDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
+  const { getToken } = useAuth()
 
   useEffect(() => {
     setMounted(true)
@@ -25,8 +27,7 @@ export default function ProgressDashboard() {
   useEffect(() => {
     const fetchProgress = async () => {
       try {
-        const userId = 'user_123' // TODO: Get from auth
-        const response = await progressAPI.getUserProgress(userId)
+        const response = await progressAPI.getUserProgress(getToken)
         setSkillData(response.skill_progress || [])
       } catch (err) {
         setError('Failed to load progress')
@@ -36,8 +37,10 @@ export default function ProgressDashboard() {
       }
     }
 
-    fetchProgress()
-  }, [])
+    if (mounted) {
+      fetchProgress()
+    }
+  }, [mounted, getToken])
 
   if (!mounted) {
     return (

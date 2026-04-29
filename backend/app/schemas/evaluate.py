@@ -8,7 +8,6 @@ from pydantic import BaseModel, Field
 class EvaluateRequestSchema(BaseModel):
     """Evaluation request schema"""
 
-    user_id: str = Field(..., description="User ID")
     question: str = Field(..., description="The question asked")
     user_answer: str = Field(..., description="Student's answer")
     correct_answer: Optional[str] = Field(None, description="Correct answer (for multiple choice)")

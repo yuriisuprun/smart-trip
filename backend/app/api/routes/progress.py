@@ -5,30 +5,31 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
+from app.core.auth import get_current_user_id
 from app.models import User, SkillProgress, Mistake
 from app.schemas.progress import UserProgressSchema, SkillProgressSchema
+from app.services.user import user_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.get("/user/{user_id}")
+@router.get("/user")
 async def get_user_progress(
-    user_id: str,
     db: Session = Depends(get_db),
+    current_user_id: str = Depends(get_current_user_id),
 ):
     """Get user's overall progress"""
     try:
-        user = db.query(User).filter(User.id == user_id).first()
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+        # Ensure user exists in database
+        user = user_service.get_or_create_user(db, current_user_id)
 
         skill_progress = db.query(SkillProgress).filter(
-            SkillProgress.user_id == user_id
+            SkillProgress.user_id == current_user_id
         ).all()
 
         recent_mistakes = db.query(Mistake).filter(
-            Mistake.user_id == user_id
+            Mistake.user_id == current_user_id
         ).order_by(Mistake.frequency.desc()).limit(5).all()
 
         return UserProgressSchema(
@@ -66,13 +67,13 @@ async def get_user_progress(
 
 @router.get("/topics")
 async def get_topic_progress(
-    user_id: str,
     db: Session = Depends(get_db),
+    current_user_id: str = Depends(get_current_user_id),
 ):
     """Get progress by topic"""
     try:
         skill_progress = db.query(SkillProgress).filter(
-            SkillProgress.user_id == user_id
+            SkillProgress.user_id == current_user_id
         ).all()
 
         return {

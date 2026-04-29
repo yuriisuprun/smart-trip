@@ -6,10 +6,12 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
+from app.core.auth import get_current_user_id
 from app.models import QuizAttempt, User
 from app.schemas.evaluate import EvaluateRequestSchema, EvaluateResponseSchema
 from app.services.llm import llm_service
 from app.services.memory import MemoryService
+from app.services.user import user_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -19,9 +21,13 @@ router = APIRouter()
 async def evaluate_answer(
     request: EvaluateRequestSchema,
     db: Session = Depends(get_db),
+    current_user_id: str = Depends(get_current_user_id),
 ):
     """Evaluate a student's answer"""
     try:
+        # Ensure user exists in database
+        user_service.get_or_create_user(db, current_user_id)
+        
         # Evaluate using LLM with language support
         feedback = await llm_service.evaluate_answer(
             question=request.question,
@@ -34,7 +40,7 @@ async def evaluate_answer(
         attempt_id = f"attempt_{uuid.uuid4()}"
         attempt = QuizAttempt(
             id=attempt_id,
-            user_id=request.user_id,
+            user_id=current_user_id,  # Use authenticated user ID
             quiz_id="general",
             question_id=f"q_{uuid.uuid4()}",
             user_answer=request.user_answer,
@@ -45,7 +51,7 @@ async def evaluate_answer(
         db.add(attempt)
 
         # Update user progress
-        user = db.query(User).filter(User.id == request.user_id).first()
+        user = db.query(User).filter(User.id == current_user_id).first()
         if user:
             user.total_questions += 1
             user.total_score = (
@@ -56,7 +62,7 @@ async def evaluate_answer(
         # Update skill progress
         memory_service = MemoryService(db)
         memory_service.update_skill_progress(
-            user_id=request.user_id,
+            user_id=current_user_id,  # Use authenticated user ID
             skill=request.topic,
             is_correct=feedback.get("is_correct", False),
             score=feedback.get("score", 0),
@@ -66,7 +72,7 @@ async def evaluate_answer(
         if not feedback.get("is_correct", False):
             for error in feedback.get("grammar_errors", []):
                 memory_service.record_mistake(
-                    user_id=request.user_id,
+                    user_id=current_user_id,  # Use authenticated user ID
                     topic=request.topic,
                     mistake_type=error.get("error", "unknown"),
                     user_answer=request.user_answer,
@@ -74,7 +80,7 @@ async def evaluate_answer(
                     explanation=error.get("explanation", ""),
                 )
 
-        memory_service.update_weak_areas(request.user_id)
+        memory_service.update_weak_areas(current_user_id)  # Use authenticated user ID
         db.commit()
 
         return EvaluateResponseSchema(

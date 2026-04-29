@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
+import { useAuth } from '@clerk/nextjs'
 import { useChatStore, Message } from '@/lib/store'
 import { getTranslations } from '@/lib/i18n'
 import { chatAPI } from '@/lib/api'
@@ -12,6 +13,7 @@ export default function ChatInterface() {
   const [mounted, setMounted] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { currentSession, addMessage, isLoading, language } = useChatStore()
+  const { getToken } = useAuth()
   const t = getTranslations(language)
 
   const scrollToBottom = () => {
@@ -47,12 +49,11 @@ export default function ChatInterface() {
       // Stream response
       const stream = await chatAPI.sendMessage({
         session_id: currentSession.id,
-        user_id: 'user_123', // TODO: Get from auth
         message: input,
         topic: currentSession.topic,
         difficulty: currentSession.difficulty,
         language: language,
-      })
+      }, getToken)
 
       const reader = stream.getReader()
       const decoder = new TextDecoder()

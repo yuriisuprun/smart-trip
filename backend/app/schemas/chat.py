@@ -16,7 +16,6 @@ class ChatRequestSchema(BaseModel):
     """Chat request schema"""
 
     session_id: str = Field(..., description="Chat session ID")
-    user_id: str = Field(..., description="User ID")
     message: str = Field(..., description="User message")
     topic: Optional[str] = Field(default="general", description="Topic: grammar, vocabulary, reading, listening")
     difficulty: Optional[str] = Field(default="A2", description="CEFR level: A2, B1, B2")

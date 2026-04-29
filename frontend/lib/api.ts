@@ -1,7 +1,9 @@
 import axios from 'axios'
+import { auth } from '@clerk/nextjs/server'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
+// Create axios instance
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -9,9 +11,49 @@ const api = axios.create({
   },
 })
 
+// Add auth interceptor for server-side requests
+api.interceptors.request.use(async (config) => {
+  // For server-side requests, get token from Clerk
+  if (typeof window === 'undefined') {
+    try {
+      const { getToken } = auth()
+      const token = await getToken()
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
+    } catch (error) {
+      console.error('Error getting auth token:', error)
+    }
+  }
+  return config
+})
+
+// Client-side API helper that includes auth token
+export const createAuthenticatedApi = (getToken: () => Promise<string | null>) => {
+  const authenticatedApi = axios.create({
+    baseURL: API_URL,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
+  authenticatedApi.interceptors.request.use(async (config) => {
+    try {
+      const token = await getToken()
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
+    } catch (error) {
+      console.error('Error getting auth token:', error)
+    }
+    return config
+  })
+
+  return authenticatedApi
+}
+
 export interface ChatRequest {
   session_id: string
-  user_id: string
   message: string
   topic?: string
   difficulty?: string
@@ -19,7 +61,6 @@ export interface ChatRequest {
 }
 
 export interface EvaluateRequest {
-  user_id: string
   question: string
   user_answer: string
   correct_answer?: string
@@ -29,11 +70,13 @@ export interface EvaluateRequest {
 }
 
 export const chatAPI = {
-  async sendMessage(request: ChatRequest): Promise<ReadableStream<Uint8Array>> {
+  async sendMessage(request: ChatRequest, getToken: () => Promise<string | null>): Promise<ReadableStream<Uint8Array>> {
+    const token = await getToken()
     const response = await fetch(`${API_URL}/api/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
       },
       body: JSON.stringify(request),
     })
@@ -45,27 +88,31 @@ export const chatAPI = {
     return response.body!
   },
 
-  async getHistory(sessionId: string) {
-    const response = await api.get(`/api/chat/history/${sessionId}`)
+  async getHistory(sessionId: string, getToken: () => Promise<string | null>) {
+    const authenticatedApi = createAuthenticatedApi(getToken)
+    const response = await authenticatedApi.get(`/api/chat/history/${sessionId}`)
     return response.data
   },
 }
 
 export const evaluateAPI = {
-  async evaluateAnswer(request: EvaluateRequest) {
-    const response = await api.post('/api/evaluate', request)
+  async evaluateAnswer(request: EvaluateRequest, getToken: () => Promise<string | null>) {
+    const authenticatedApi = createAuthenticatedApi(getToken)
+    const response = await authenticatedApi.post('/api/evaluate', request)
     return response.data
   },
 }
 
 export const progressAPI = {
-  async getUserProgress(userId: string) {
-    const response = await api.get(`/api/progress/user/${userId}`)
+  async getUserProgress(getToken: () => Promise<string | null>) {
+    const authenticatedApi = createAuthenticatedApi(getToken)
+    const response = await authenticatedApi.get('/api/progress/user')
     return response.data
   },
 
-  async getTopicProgress(userId: string) {
-    const response = await api.get(`/api/progress/topics?user_id=${userId}`)
+  async getTopicProgress(getToken: () => Promise<string | null>) {
+    const authenticatedApi = createAuthenticatedApi(getToken)
+    const response = await authenticatedApi.get('/api/progress/topics')
     return response.data
   },
 }
@@ -87,4 +134,5 @@ export const adminAPI = {
   },
 }
 
+export { api }
 export default api

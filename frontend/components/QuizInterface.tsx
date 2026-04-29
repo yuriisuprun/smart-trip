@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useAuth } from '@clerk/nextjs'
 import { evaluateAPI } from '@/lib/api'
 import { CheckCircle, XCircle, Loader } from 'lucide-react'
 
@@ -33,6 +34,7 @@ export default function QuizInterface() {
   const [isEvaluating, setIsEvaluating] = useState(false)
   const [showFeedback, setShowFeedback] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const { getToken } = useAuth()
 
   useEffect(() => {
     setMounted(true)
@@ -53,13 +55,12 @@ export default function QuizInterface() {
     setIsEvaluating(true)
     try {
       const result = await evaluateAPI.evaluateAnswer({
-        user_id: 'user_123', // TODO: Get from auth
         question: currentQuestion.question,
         user_answer: userAnswer,
         correct_answer: currentQuestion.correctAnswer,
         question_type: currentQuestion.type,
         topic: currentQuestion.topic,
-      })
+      }, getToken)
 
       setEvaluation(result.feedback)
       setShowFeedback(true)

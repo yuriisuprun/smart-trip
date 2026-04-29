@@ -10,7 +10,7 @@ import sentry_sdk
 
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.api.routes import chat, evaluate, progress, admin, health
+from app.api.routes import chat, evaluate, progress, admin, health, user
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -63,6 +63,7 @@ app.include_router(health.router, prefix="/api/health", tags=["health"])
 app.include_router(chat.router, prefix="/api/chat", tags=["chat"])
 app.include_router(evaluate.router, prefix="/api/evaluate", tags=["evaluate"])
 app.include_router(progress.router, prefix="/api/progress", tags=["progress"])
+app.include_router(user.router, prefix="/api/user", tags=["user"])
 app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
 
 

@@ -1,13 +1,13 @@
 # Italian Language AI Tutor - MVP
 
-A full-stack AI tutoring system for preparing students for the Italian language exam at Prefettura di Milano. Features context-aware learning, RAG-based knowledge retrieval, and adaptive difficulty.
+A full-stack AI tutoring system for preparing students for the Italian language exam at Prefettura di Milano. Features context-aware learning, RAG-based knowledge retrieval, adaptive difficulty, and **Clerk.dev authentication**.
 
 ## 🏗️ Architecture
 
 ```
-Frontend (Next.js) 
+Frontend (Next.js + Clerk Auth) 
     ↓ 
-FastAPI Backend (AI Orchestrator) 
+FastAPI Backend (AI Orchestrator + JWT Validation) 
     ↓ 
 LangChain + Custom Orchestrator 
     ↓ 
@@ -19,6 +19,18 @@ LangChain + Custom Orchestrator
 OpenAI LLM
 ```
 
+## 🔐 Authentication System
+
+This application now uses **Clerk.dev** for user authentication:
+
+- **User Registration & Login**: Secure authentication with email/social providers
+- **JWT Token Validation**: All API endpoints protected with Clerk JWT tokens
+- **User Profile Management**: Dedicated profile page for user settings
+- **Automatic User Creation**: Users automatically created in database on first login
+- **Session Persistence**: Secure session management via Clerk
+
+**⚠️ Important**: The application requires authentication to access. See [CLERK_INTEGRATION_GUIDE.md](./CLERK_INTEGRATION_GUIDE.md) for complete setup instructions.
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -26,12 +38,22 @@ OpenAI LLM
 - Python 3.11+
 - Node.js 18+
 - OpenAI API key
+- **Clerk.dev account** (free tier available)
 
 ### Setup
 
 ```bash
 # Clone and navigate
 cd italian-tutor
+
+# Set up authentication (REQUIRED)
+# 1. Create account at https://clerk.dev
+# 2. Create new application
+# 3. Get your API keys
+
+# Configure environment variables
+# Backend: Add CLERK_SECRET_KEY to backend/.env
+# Frontend: Add NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY to frontend/.env.local
 
 # Start all services
 docker-compose up -d
@@ -47,8 +69,7 @@ docker-compose up -d
 Create `.env.local` in frontend:
 ```
 NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_key
-CLERK_SECRET_KEY=your_key
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
 ```
 
 Create `.env` in backend:
@@ -56,8 +77,18 @@ Create `.env` in backend:
 OPENAI_API_KEY=your_key
 DATABASE_URL=postgresql://user:password@postgres:5432/italian_tutor
 QDRANT_URL=http://qdrant:6333
-CLERK_SECRET_KEY=your_key
+CLERK_SECRET_KEY=sk_test_your_key_here
 ```
+
+### First Time Setup
+
+1. **Get Clerk Keys**: Visit [clerk.dev](https://clerk.dev), create an app, and get your keys
+2. **Configure Environment**: Add Clerk keys to both frontend and backend `.env` files
+3. **Start Services**: Run `docker-compose up -d`
+4. **Seed Content**: Visit `http://localhost:8000/api/admin/seed-all` to populate the knowledge base
+5. **Access App**: Go to `http://localhost:3335` and sign up/sign in
+
+📖 **Detailed Setup Guide**: See [CLERK_INTEGRATION_GUIDE.md](./CLERK_INTEGRATION_GUIDE.md) for complete authentication setup instructions.
 
 ## 📁 Project Structure
 

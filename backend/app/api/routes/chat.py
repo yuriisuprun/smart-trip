@@ -7,11 +7,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from app.core.database import get_db
+from app.core.auth import get_current_user_id
 from app.models import ChatSession, ChatMessage, User
 from app.schemas.chat import ChatRequestSchema, ChatHistorySchema
 from app.services.rag import rag_service
 from app.services.llm import llm_service
 from app.services.memory import MemoryService
+from app.services.user import user_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -21,18 +23,23 @@ router = APIRouter()
 async def chat(
     request: ChatRequestSchema,
     db: Session = Depends(get_db),
+    current_user_id: str = Depends(get_current_user_id),
 ):
     """Chat endpoint with streaming response"""
     try:
+        # Ensure user exists in database
+        user_service.get_or_create_user(db, current_user_id)
+        
         # Get or create session
         session = db.query(ChatSession).filter(
-            ChatSession.id == request.session_id
+            ChatSession.id == request.session_id,
+            ChatSession.user_id == current_user_id  # Ensure user owns session
         ).first()
 
         if not session:
             session = ChatSession(
                 id=request.session_id,
-                user_id=request.user_id,
+                user_id=current_user_id,  # Use authenticated user ID
                 topic=request.topic,
                 difficulty=request.difficulty,
                 language=request.language or "en",
@@ -54,7 +61,7 @@ async def chat(
         # Get memory context
         memory_service = MemoryService(db)
         short_term = memory_service.get_short_term_memory(request.session_id)
-        long_term = memory_service.get_long_term_memory(request.user_id)
+        long_term = memory_service.get_long_term_memory(current_user_id)  # Use authenticated user ID
 
         # Retrieve relevant context from RAG
         retrieved = rag_service.retrieve(
@@ -105,11 +112,13 @@ async def chat(
 async def get_chat_history(
     session_id: str,
     db: Session = Depends(get_db),
+    current_user_id: str = Depends(get_current_user_id),
 ):
     """Get chat history for a session"""
     try:
         session = db.query(ChatSession).filter(
-            ChatSession.id == session_id
+            ChatSession.id == session_id,
+            ChatSession.user_id == current_user_id  # Ensure user owns session
         ).first()
 
         if not session:

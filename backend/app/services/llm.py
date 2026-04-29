@@ -6,6 +6,7 @@ import json
 from typing import Optional, Dict, List, AsyncGenerator
 from openai import AsyncOpenAI
 from app.core.config import settings
+from app.services.language import language_service, Language
 
 logger = logging.getLogger(__name__)
 
@@ -54,28 +55,28 @@ class LLMService:
         user_answer: str,
         correct_answer: Optional[str] = None,
         context: Optional[str] = None,
+        language: str = "en",
     ) -> Dict:
         """Evaluate a student's answer"""
-        prompt = f"""You are an expert Italian language tutor evaluating a student's answer.
-
-Question: {question}
-Student's Answer: {user_answer}
-{f'Correct Answer: {correct_answer}' if correct_answer else ''}
-{f'Context: {context}' if context else ''}
-
-Provide evaluation in JSON format:
-{{
-    "score": <0-10>,
-    "is_correct": <true/false>,
-    "corrections": [<list of corrections>],
-    "explanation": "<detailed explanation>",
-    "improvement_suggestions": [<list of suggestions>],
-    "grammar_errors": [
-        {{"error": "<error>", "correction": "<correction>", "explanation": "<why>"}}
-    ]
-}}
-
-Be encouraging but honest. Focus on learning, not just correctness."""
+        
+        # Validate and convert language
+        if not language_service.is_supported_language(language):
+            language = settings.DEFAULT_LANGUAGE
+        
+        lang = Language(language)
+        
+        # Build context strings
+        correct_answer_str = f'Correct Answer: {correct_answer}' if correct_answer else ''
+        context_str = f'Context: {context}' if context else ''
+        
+        prompt = language_service.get_system_prompt(
+            language=lang,
+            prompt_type="evaluation",
+            question=question,
+            user_answer=user_answer,
+            correct_answer=correct_answer_str,
+            context=context_str
+        )
 
         try:
             response = await self.client.chat.completions.create(
@@ -96,11 +97,12 @@ Be encouraging but honest. Focus on learning, not just correctness."""
                 if json_match:
                     result = json.loads(json_match.group())
                 else:
+                    error_msg = language_service.get_message(lang, "error")
                     result = {
                         "score": 5,
                         "is_correct": False,
                         "corrections": [],
-                        "explanation": response_text,
+                        "explanation": response_text or error_msg,
                         "improvement_suggestions": [],
                         "grammar_errors": [],
                     }
@@ -109,11 +111,12 @@ Be encouraging but honest. Focus on learning, not just correctness."""
 
         except Exception as e:
             logger.error(f"Error evaluating answer: {e}")
+            error_msg = language_service.get_message(Language(language), "error")
             return {
                 "score": 0,
                 "is_correct": False,
                 "corrections": [],
-                "explanation": f"Error: {str(e)}",
+                "explanation": f"{error_msg}: {str(e)}",
                 "improvement_suggestions": [],
                 "grammar_errors": [],
             }
@@ -126,8 +129,15 @@ Be encouraging but honest. Focus on learning, not just correctness."""
         short_term_memory: List[Dict],
         long_term_memory: Dict,
         retrieved_context: List[Dict],
+        language: str = "en",
     ) -> str:
         """Generate a tutoring response with step-by-step guidance"""
+
+        # Validate and convert language
+        if not language_service.is_supported_language(language):
+            language = settings.DEFAULT_LANGUAGE
+        
+        lang = Language(language)
 
         # Build context
         context_str = ""
@@ -140,24 +150,20 @@ Be encouraging but honest. Focus on learning, not just correctness."""
         if long_term_memory.get("weak_areas"):
             weak_areas_str = f"\nStudent's weak areas: {', '.join(long_term_memory['weak_areas'].keys())}"
 
-        system_prompt = f"""You are an expert Italian language tutor for the Prefettura di Milano exam (CEFR {difficulty} level).
+        # Translate topic and difficulty for display
+        translated_topic = language_service.translate_topic(topic, lang)
+        translated_difficulty = language_service.translate_difficulty(difficulty, lang)
 
-TUTORING PRINCIPLES:
-1. NEVER give direct answers - guide the student through reasoning
-2. Provide: explanation → guided questions → hints → final answer only if needed
-3. Adapt to the student's level and weak areas
-4. Be encouraging and supportive
-5. Correct mistakes with clear explanations
-6. Reference past mistakes to help learning
-
-STUDENT PROFILE:
-- CEFR Level: {long_term_memory.get('cefr_level', difficulty)}
-- Topic: {topic}
-- Accuracy: {long_term_memory.get('total_score', 0):.1f}%{weak_areas_str}
-
-{context_str}
-
-Respond in a conversational, supportive tone. Use Italian examples when relevant."""
+        system_prompt = language_service.get_system_prompt(
+            language=lang,
+            prompt_type="tutor_base",
+            difficulty=translated_difficulty,
+            cefr_level=long_term_memory.get('cefr_level', difficulty),
+            topic=translated_topic,
+            accuracy=long_term_memory.get('total_score', 0),
+            weak_areas=weak_areas_str,
+            context=context_str
+        )
 
         messages = [
             {"role": msg["role"], "content": msg["content"]}

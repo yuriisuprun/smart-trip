@@ -16,6 +16,7 @@ class ChatSession(Base):
     user_id = Column(String, ForeignKey("users.id"), index=True)
     topic = Column(String)  # "grammar", "vocabulary", "reading", "listening"
     difficulty = Column(String, default="A2")  # CEFR level
+    language = Column(String, default="en")  # Interface language: "en", "it"
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

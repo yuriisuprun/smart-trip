@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from 'react'
 import { useChatStore, ChatSession, Message } from '@/lib/store'
+import { getTranslations, formatDifficultyLevel } from '@/lib/i18n'
 import ChatInterface from '@/components/ChatInterface'
 import ProgressDashboard from '@/components/ProgressDashboard'
 import QuizInterface from '@/components/QuizInterface'
+import LanguageSelector from '@/components/LanguageSelector'
 import { BookOpen, BarChart3, HelpCircle, Plus } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -13,7 +15,8 @@ type TabType = 'chat' | 'quiz' | 'progress'
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabType>('chat')
   const [mounted, setMounted] = useState(false)
-  const { currentSession, setCurrentSession } = useChatStore()
+  const { currentSession, setCurrentSession, language } = useChatStore()
+  const t = getTranslations(language)
 
   useEffect(() => {
     setMounted(true)
@@ -24,10 +27,11 @@ export default function Home() {
         topic: 'grammar',
         difficulty: 'A2',
         messages: [],
+        language,
       }
       setCurrentSession(newSession)
     }
-  }, [currentSession, setCurrentSession])
+  }, [currentSession, setCurrentSession, language])
 
   const createNewSession = (topic: string, difficulty: string) => {
     const newSession: ChatSession = {
@@ -35,6 +39,7 @@ export default function Home() {
       topic,
       difficulty,
       messages: [],
+      language,
     }
     setCurrentSession(newSession)
     setActiveTab('chat')
@@ -43,6 +48,13 @@ export default function Home() {
   if (!mounted) {
     return null
   }
+
+  const topicItems = [
+    { topic: 'grammar', label: t.grammar, color: '#dbeafe' },
+    { topic: 'vocabulary', label: t.vocabulary, color: '#dcfce7' },
+    { topic: 'reading', label: t.reading, color: '#fae8ff' },
+    { topic: 'listening', label: t.listening, color: '#fed7aa' },
+  ]
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
@@ -58,39 +70,47 @@ export default function Home() {
           padding: '0 1.5rem',
           display: 'flex',
           alignItems: 'center',
-          gap: '0.75rem'
+          justifyContent: 'space-between'
         }}>
           <div style={{
-            width: '40px',
-            height: '40px',
-            backgroundColor: '#4f46e5',
-            borderRadius: '8px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontWeight: 'bold',
-            fontSize: '14px'
+            gap: '0.75rem'
           }}>
-            IT
-          </div>
-          <div>
-            <h1 style={{ 
-              fontSize: '1.5rem', 
-              fontWeight: 'bold', 
-              color: '#1e293b',
-              margin: 0
+            <div style={{
+              width: '40px',
+              height: '40px',
+              backgroundColor: '#4f46e5',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: '14px'
             }}>
-              Italian Language AI Tutor
-            </h1>
-            <p style={{ 
-              fontSize: '0.875rem', 
-              color: '#64748b',
-              margin: 0
-            }}>
-              Exam Preparation
-            </p>
+              IT
+            </div>
+            <div>
+              <h1 style={{ 
+                fontSize: '1.5rem', 
+                fontWeight: 'bold', 
+                color: '#1e293b',
+                margin: 0
+              }}>
+                {t.appTitle}
+              </h1>
+              <p style={{ 
+                fontSize: '0.875rem', 
+                color: '#64748b',
+                margin: 0
+              }}>
+                {t.appSubtitle}
+              </p>
+            </div>
           </div>
+          
+          <LanguageSelector />
         </div>
       </header>
 
@@ -127,7 +147,7 @@ export default function Home() {
             }}
           >
             <BookOpen size={16} />
-            Chat Tutor
+            {t.chatTutor}
           </button>
           <button
             onClick={() => setActiveTab('quiz')}
@@ -147,7 +167,7 @@ export default function Home() {
             }}
           >
             <HelpCircle size={16} />
-            Quiz
+            {t.quiz}
           </button>
           <button
             onClick={() => setActiveTab('progress')}
@@ -167,7 +187,7 @@ export default function Home() {
             }}
           >
             <BarChart3 size={16} />
-            Progress
+            {t.progress}
           </button>
         </div>
 
@@ -179,12 +199,7 @@ export default function Home() {
             gap: '0.75rem',
             marginBottom: '1.5rem'
           }}>
-            {[
-              { topic: 'grammar', label: 'Grammar', color: '#dbeafe' },
-              { topic: 'vocabulary', label: 'Vocabulary', color: '#dcfce7' },
-              { topic: 'reading', label: 'Reading', color: '#fae8ff' },
-              { topic: 'listening', label: 'Listening', color: '#fed7aa' },
-            ].map((item) => (
+            {topicItems.map((item) => (
               <button
                 key={item.topic}
                 onClick={() => createNewSession(item.topic, 'A2')}
@@ -255,7 +270,9 @@ export default function Home() {
                 color: '#1e40af',
                 margin: 0
               }}>
-                <span style={{ fontWeight: '500' }}>Current Session:</span> {currentSession.topic.toUpperCase()} • Level: {currentSession.difficulty}
+                <span style={{ fontWeight: '500' }}>{t.currentSession}:</span> {
+                  topicItems.find(item => item.topic === currentSession.topic)?.label || currentSession.topic.toUpperCase()
+                } • {t.level}: {formatDifficultyLevel(currentSession.difficulty, language)}
               </p>
             </div>
           </div>

@@ -54,6 +54,10 @@ class Settings(BaseSettings):
     RAG_CHUNK_OVERLAP: int = 50
     RAG_TOP_K: int = 5
 
+    # Language Settings
+    SUPPORTED_LANGUAGES: List[str] = ["en", "it"]
+    DEFAULT_LANGUAGE: str = "en"
+
     class Config:
         env_file = ".env"
         case_sensitive = True

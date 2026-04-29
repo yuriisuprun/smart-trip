@@ -15,6 +15,7 @@ export interface ChatRequest {
   message: string
   topic?: string
   difficulty?: string
+  language?: string
 }
 
 export interface EvaluateRequest {
@@ -24,6 +25,7 @@ export interface EvaluateRequest {
   correct_answer?: string
   question_type?: string
   topic?: string
+  language?: string
 }
 
 export const chatAPI = {

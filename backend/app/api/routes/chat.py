@@ -35,6 +35,7 @@ async def chat(
                 user_id=request.user_id,
                 topic=request.topic,
                 difficulty=request.difficulty,
+                language=request.language or "en",
             )
             db.add(session)
             db.commit()
@@ -61,30 +62,25 @@ async def chat(
             top_k=5,
         )
 
-        # Generate response
+        # Generate response using language-aware LLM service
         async def generate():
             response_text = ""
-            async for chunk in llm_service.chat_stream(
-                messages=[
-                    {"role": msg["role"], "content": msg["content"]}
-                    for msg in short_term
-                ],
-                system_prompt=f"""You are an expert Italian language tutor for the Prefettura di Milano exam (CEFR {request.difficulty} level).
-
-TUTORING PRINCIPLES:
-1. NEVER give direct answers - guide the student through reasoning
-2. Provide: explanation → guided questions → hints → final answer only if needed
-3. Adapt to the student's level and weak areas
-4. Be encouraging and supportive
-5. Correct mistakes with clear explanations
-
-STUDENT PROFILE:
-- CEFR Level: {long_term.get('cefr_level', request.difficulty)}
-- Topic: {request.topic}
-- Weak areas: {', '.join(long_term.get('weak_areas', {}).keys()) or 'None identified yet'}
-
-Respond in a conversational, supportive tone. Use Italian examples when relevant.""",
-            ):
+            
+            # Use the updated LLM service with language support
+            full_response = await llm_service.generate_tutoring_response(
+                user_message=request.message,
+                topic=request.topic,
+                difficulty=request.difficulty,
+                short_term_memory=short_term,
+                long_term_memory=long_term,
+                retrieved_context=retrieved,
+                language=request.language or "en"
+            )
+            
+            # Stream the response word by word for better UX
+            words = full_response.split()
+            for i, word in enumerate(words):
+                chunk = word + (" " if i < len(words) - 1 else "")
                 response_text += chunk
                 yield chunk
 
@@ -131,6 +127,7 @@ async def get_chat_history(
             ],
             topic=session.topic,
             difficulty=session.difficulty,
+            language=getattr(session, 'language', 'en'),
             created_at=session.created_at.isoformat(),
             updated_at=session.updated_at.isoformat(),
         )

@@ -20,6 +20,7 @@ class ChatRequestSchema(BaseModel):
     message: str = Field(..., description="User message")
     topic: Optional[str] = Field(default="general", description="Topic: grammar, vocabulary, reading, listening")
     difficulty: Optional[str] = Field(default="A2", description="CEFR level: A2, B1, B2")
+    language: Optional[str] = Field(default="en", description="Interface language: en, it")
 
 
 class ChatResponseSchema(BaseModel):
@@ -39,6 +40,7 @@ class ChatHistorySchema(BaseModel):
     messages: List[ChatMessageSchema]
     topic: str
     difficulty: str
+    language: str
     created_at: str
     updated_at: str
 

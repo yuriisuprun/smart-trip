@@ -22,11 +22,12 @@ async def evaluate_answer(
 ):
     """Evaluate a student's answer"""
     try:
-        # Evaluate using LLM
+        # Evaluate using LLM with language support
         feedback = await llm_service.evaluate_answer(
             question=request.question,
             user_answer=request.user_answer,
             correct_answer=request.correct_answer,
+            language=request.language or "en",
         )
 
         # Store attempt

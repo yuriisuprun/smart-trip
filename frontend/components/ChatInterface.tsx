@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { useChatStore, Message } from '@/lib/store'
+import { getTranslations } from '@/lib/i18n'
 import { chatAPI } from '@/lib/api'
 import { Send, Loader } from 'lucide-react'
 
@@ -10,7 +11,8 @@ export default function ChatInterface() {
   const [isStreaming, setIsStreaming] = useState(false)
   const [mounted, setMounted] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const { currentSession, addMessage, isLoading } = useChatStore()
+  const { currentSession, addMessage, isLoading, language } = useChatStore()
+  const t = getTranslations(language)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -49,6 +51,7 @@ export default function ChatInterface() {
         message: input,
         topic: currentSession.topic,
         difficulty: currentSession.difficulty,
+        language: language,
       })
 
       const reader = stream.getReader()
@@ -96,7 +99,7 @@ export default function ChatInterface() {
         justifyContent: 'center', 
         height: '100%' 
       }}>
-        <p style={{ color: '#6b7280' }}>Loading...</p>
+        <p style={{ color: '#6b7280' }}>{t.loading}</p>
       </div>
     )
   }
@@ -109,7 +112,12 @@ export default function ChatInterface() {
         justifyContent: 'center', 
         height: '100%' 
       }}>
-        <p style={{ color: '#6b7280' }}>Select or create a chat session to begin</p>
+        <p style={{ color: '#6b7280' }}>
+          {language === 'it' 
+            ? 'Seleziona o crea una sessione di chat per iniziare'
+            : 'Select or create a chat session to begin'
+          }
+        </p>
       </div>
     )
   }
@@ -196,7 +204,7 @@ export default function ChatInterface() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask your question..."
+          placeholder={t.typeMessage}
           disabled={isStreaming}
           style={{
             flex: 1,

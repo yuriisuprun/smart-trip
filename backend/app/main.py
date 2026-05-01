@@ -31,16 +31,16 @@ Base.metadata.create_all(bind=engine)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup/shutdown"""
-    logger.info("🚀 Starting Italian Language AI Tutor")
+    logger.info("🚀 Starting AmicoLingua - Italian Learning Companion")
     yield
-    logger.info("🛑 Shutting down Italian Language AI Tutor")
+    logger.info("🛑 Shutting down AmicoLingua")
 
 
 # Create FastAPI app
 app = FastAPI(
-    title="Italian Language AI Tutor API",
-    description="Context-aware AI tutoring system for Italian language exam preparation",
-    version="1.0.0",
+    title="AmicoLingua API",
+    description="AI-powered Italian language learning companion with advanced grammar tutoring and personalized exam preparation",
+    version="2.0.0",
     lifespan=lifespan,
 )
 
@@ -71,16 +71,22 @@ app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
 async def root():
     """Root endpoint"""
     return {
-        "message": "Italian Language AI Tutor API",
-        "version": "1.0.0",
+        "message": "AmicoLingua API - Your Italian Learning Companion",
+        "version": "2.0.0",
         "docs": "/docs",
+        "features": [
+            "Advanced Italian Grammar Tutoring",
+            "B1-B2 CEFR Level Content",
+            "Interactive Exercises",
+            "Personalized Learning"
+        ]
     }
 
 
 @app.get("/health")
 async def health():
     """Simple health check"""
-    return {"status": "healthy", "service": "Italian Language AI Tutor"}
+    return {"status": "healthy", "service": "AmicoLingua", "version": "2.0.0"}
 
 
 if __name__ == "__main__":

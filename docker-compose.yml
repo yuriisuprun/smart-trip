@@ -2,18 +2,18 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:16-alpine
-    container_name: italian_tutor_postgres
+    container_name: amicolingua_postgres
     environment:
-      POSTGRES_USER: italian_user
-      POSTGRES_PASSWORD: italian_pass
-      POSTGRES_DB: italian_tutor
+      POSTGRES_USER: amicolingua_user
+      POSTGRES_PASSWORD: amicolingua_pass
+      POSTGRES_DB: amicolingua_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/sql/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U italian_user"]
+      test: ["CMD-SHELL", "pg_isready -U amicolingua_user"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -21,7 +21,7 @@ services:
   # Qdrant Vector Database
   qdrant:
     image: qdrant/qdrant:latest
-    container_name: italian_tutor_qdrant
+    container_name: amicolingua_qdrant
     ports:
       - "6333:6333"
     volumes:
@@ -34,10 +34,10 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: italian_tutor_backend
+    container_name: amicolingua_backend
     environment:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
-      DATABASE_URL: postgresql://italian_user:italian_pass@postgres:5432/italian_tutor
+      DATABASE_URL: postgresql://amicolingua_user:amicolingua_pass@postgres:5432/amicolingua_db
       QDRANT_URL: http://qdrant:6333
       ENVIRONMENT: development
       DEBUG: "true"
@@ -57,7 +57,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: italian_tutor_frontend
+    container_name: amicolingua_frontend
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8000
     ports:
@@ -75,4 +75,4 @@ volumes:
 
 networks:
   default:
-    name: italian_tutor_network
+    name: amicolingua_network

@@ -77,37 +77,40 @@ export default function Home() {
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.75rem'
+            gap: '1rem'
           }}>
             <div style={{
-              width: '40px',
-              height: '40px',
-              backgroundColor: '#4f46e5',
-              borderRadius: '8px',
+              width: '48px',
+              height: '48px',
+              background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+              borderRadius: '12px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'white',
               fontWeight: 'bold',
-              fontSize: '14px'
+              fontSize: '18px',
+              boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)'
             }}>
-              IT
+              🇮🇹
             </div>
             <div>
               <h1 style={{ 
-                fontSize: '1.5rem', 
-                fontWeight: 'bold', 
+                fontSize: '1.75rem', 
+                fontWeight: '700', 
                 color: '#1e293b',
-                margin: 0
+                margin: 0,
+                letterSpacing: '-0.025em'
               }}>
-                {t.appTitle}
+                AmicoLingua
               </h1>
               <p style={{ 
                 fontSize: '0.875rem', 
                 color: '#64748b',
-                margin: 0
+                margin: 0,
+                fontWeight: '500'
               }}>
-                {t.appSubtitle}
+                Your Italian Learning Companion
               </p>
             </div>
           </div>
@@ -220,50 +223,59 @@ export default function Home() {
           }}>
             <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🇮🇹</div>
             <h2 style={{
-              fontSize: '2rem',
-              fontWeight: 'bold',
+              fontSize: '2.5rem',
+              fontWeight: '800',
               color: '#1e293b',
-              marginBottom: '1rem'
+              marginBottom: '1rem',
+              letterSpacing: '-0.025em'
             }}>
-              Welcome to Italian AI Tutor
+              Welcome to AmicoLingua
             </h2>
             <p style={{
               fontSize: '1.125rem',
               color: '#64748b',
               marginBottom: '2rem',
-              lineHeight: '1.6'
+              lineHeight: '1.7',
+              maxWidth: '480px',
+              margin: '0 auto 2rem auto'
             }}>
-              Your personalized AI-powered Italian language learning companion. 
-              Get instant feedback, practice conversations, and track your progress 
-              as you prepare for Italian language exams.
+              Master Italian with your AI-powered language companion. 
+              Get personalized lessons, instant feedback, and expert guidance 
+              for Italian language certification exams.
             </p>
             <SignInButton mode="modal">
               <button style={{
                 backgroundColor: '#4f46e5',
                 color: 'white',
-                padding: '0.75rem 2rem',
-                borderRadius: '8px',
+                padding: '1rem 2.5rem',
+                borderRadius: '12px',
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: '1rem',
+                fontSize: '1.1rem',
                 fontWeight: '600',
-                transition: 'all 0.2s'
+                transition: 'all 0.3s ease',
+                boxShadow: '0 4px 14px rgba(79, 70, 229, 0.4)',
+                transform: 'translateY(0)'
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.backgroundColor = '#4338ca'
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.boxShadow = '0 8px 25px rgba(79, 70, 229, 0.5)'
               }}
               onMouseOut={(e) => {
                 e.currentTarget.style.backgroundColor = '#4f46e5'
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 4px 14px rgba(79, 70, 229, 0.4)'
               }}>
-                Get Started - Sign In
+                Start Learning Italian
               </button>
             </SignInButton>
             <p style={{
               fontSize: '0.875rem',
               color: '#9ca3af',
-              marginTop: '1rem'
+              marginTop: '1.5rem'
             }}>
-              Free to use • No credit card required
+              🚀 Free to use • 🎯 No credit card required • 🇮🇹 Expert Italian content
             </p>
           </div>
         </div>

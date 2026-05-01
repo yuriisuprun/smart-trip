@@ -73,8 +73,8 @@ export interface Translations {
 const translations: Record<Language, Translations> = {
   en: {
     // Header
-    appTitle: 'Italian Language AI Tutor',
-    appSubtitle: 'Exam Preparation',
+    appTitle: 'AmicoLingua',
+    appSubtitle: 'Your Italian Learning Companion',
     
     // Navigation
     chatTutor: 'Chat Tutor',
@@ -139,8 +139,8 @@ const translations: Record<Language, Translations> = {
   
   it: {
     // Header
-    appTitle: 'Tutor AI di Lingua Italiana',
-    appSubtitle: 'Preparazione Esami',
+    appTitle: 'AmicoLingua',
+    appSubtitle: 'Il Tuo Compagno di Apprendimento Italiano',
     
     // Navigation
     chatTutor: 'Chat Tutor',

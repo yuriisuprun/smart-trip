@@ -141,72 +141,72 @@ export default function ChatInterface() {
         alignItems: 'center',
         backgroundColor: '#f8fafc'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <div style={{
-            width: '32px',
-            height: '32px',
-            backgroundColor: '#4f46e5',
-            borderRadius: '6px',
+            width: '40px',
+            height: '40px',
+            background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+            borderRadius: '10px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: 'white',
             fontWeight: 'bold',
-            fontSize: '12px'
+            fontSize: '16px',
+            boxShadow: '0 2px 8px rgba(79, 70, 229, 0.3)'
           }}>
-            IT
+            🇮🇹
           </div>
           <div>
-            <h3 style={{ margin: 0, color: '#1e293b', fontSize: '1.125rem', fontWeight: '600' }}>
-              Italian Grammar Tutor
+            <h3 style={{ margin: 0, color: '#1e293b', fontSize: '1.25rem', fontWeight: '700' }}>
+              AmicoLingua Tutor
             </h3>
-            <p style={{ margin: 0, color: '#64748b', fontSize: '0.75rem' }}>
-              Advanced B1-B2 Grammar Assistant
+            <p style={{ margin: 0, color: '#64748b', fontSize: '0.8rem', fontWeight: '500' }}>
+              Advanced Italian Grammar Assistant • B1-B2 Level
             </p>
           </div>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <div style={{
-            padding: '0.25rem 0.5rem',
-            backgroundColor: '#dbeafe',
-            borderRadius: '4px',
-            fontSize: '0.75rem',
+            padding: '0.5rem 1rem',
+            background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
+            borderRadius: '8px',
+            fontSize: '0.8rem',
             color: '#1e40af',
-            fontWeight: '500'
+            fontWeight: '600',
+            border: '1px solid #bfdbfe'
           }}>
-            500+ Grammar Rules
+            ✨ 500+ Grammar Rules
           </div>
           
           <button
             onClick={() => setShowAdminPanel(true)}
             style={{
-              padding: '0.5rem 0.75rem',
-              backgroundColor: '#4f46e5',
+              padding: '0.75rem 1.25rem',
+              background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
               color: 'white',
               border: 'none',
-              borderRadius: '6px',
+              borderRadius: '10px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem',
-              fontSize: '0.875rem',
-              fontWeight: '500',
-              transition: 'all 0.2s',
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
+              fontSize: '0.9rem',
+              fontWeight: '600',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 2px 8px rgba(79, 70, 229, 0.3)'
             }}
             onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#4338ca'
-              e.currentTarget.style.transform = 'translateY(-1px)'
-              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.15)'
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(79, 70, 229, 0.4)'
             }}
             onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = '#4f46e5'
               e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.1)'
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(79, 70, 229, 0.3)'
             }}
           >
-            <Settings size={16} />
+            <Settings size={18} />
             Content Admin
           </button>
         </div>
@@ -224,63 +224,92 @@ export default function ChatInterface() {
         {currentSession.messages.length === 0 && (
           <div style={{
             textAlign: 'center',
-            padding: '2rem',
-            backgroundColor: '#f8fafc',
-            borderRadius: '8px',
+            padding: '3rem 2rem',
+            background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+            borderRadius: '16px',
             border: '1px solid #e2e8f0'
           }}>
-            <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>🇮🇹</div>
+            <div style={{ 
+              fontSize: '3rem', 
+              marginBottom: '1.5rem',
+              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
+            }}>🇮🇹</div>
             <h3 style={{ 
               margin: '0 0 1rem 0', 
               color: '#1e293b', 
-              fontSize: '1.25rem', 
-              fontWeight: '600' 
+              fontSize: '1.5rem', 
+              fontWeight: '700',
+              letterSpacing: '-0.025em'
             }}>
-              Welcome to Advanced Italian Grammar
+              Benvenuto in AmicoLingua!
             </h3>
             <p style={{ 
-              margin: '0 0 1.5rem 0', 
+              margin: '0 0 2rem 0', 
               color: '#64748b', 
-              fontSize: '0.875rem',
-              lineHeight: '1.5'
+              fontSize: '1rem',
+              lineHeight: '1.6',
+              maxWidth: '500px',
+              margin: '0 auto 2rem auto'
             }}>
-              Ask me about B1-B2 level Italian grammar topics. I can help with:
+              Your AI companion for mastering Italian grammar. Ask me about B1-B2 level topics 
+              and get detailed explanations with examples and exercises.
             </p>
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '0.75rem',
-              marginBottom: '1.5rem'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: '1rem',
+              marginBottom: '2rem'
             }}>
               {[
-                '🎯 Subjunctive Mood (Congiuntivo)',
-                '💬 Conditional Tense (Condizionale)', 
-                '📢 Imperative Commands (Imperativo)',
-                '🔗 Complex Prepositions',
-                '🎪 CI/NE Pronouns',
-                '🔄 Relative Pronouns'
-              ].map((topic, index) => (
+                { icon: '🎯', topic: 'Subjunctive Mood', subtitle: 'Congiuntivo' },
+                { icon: '💬', topic: 'Conditional Tense', subtitle: 'Condizionale' }, 
+                { icon: '📢', topic: 'Imperative Commands', subtitle: 'Imperativo' },
+                { icon: '🔗', topic: 'Complex Prepositions', subtitle: 'Preposizioni' },
+                { icon: '🎪', topic: 'CI/NE Pronouns', subtitle: 'Pronomi' },
+                { icon: '🔄', topic: 'Relative Pronouns', subtitle: 'Pronomi Relativi' }
+              ].map((item, index) => (
                 <div key={index} style={{
-                  padding: '0.5rem',
-                  backgroundColor: 'white',
-                  borderRadius: '6px',
+                  padding: '1rem',
+                  background: 'white',
+                  borderRadius: '12px',
                   border: '1px solid #e2e8f0',
-                  fontSize: '0.75rem',
-                  color: '#374151'
+                  fontSize: '0.85rem',
+                  color: '#374151',
+                  textAlign: 'center',
+                  transition: 'all 0.2s ease',
+                  cursor: 'default'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)'
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)'
+                  e.currentTarget.style.borderColor = '#4f46e5'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = 'none'
+                  e.currentTarget.style.borderColor = '#e2e8f0'
                 }}>
-                  {topic}
+                  <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{item.icon}</div>
+                  <div style={{ fontWeight: '600', color: '#1e293b' }}>{item.topic}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>{item.subtitle}</div>
                 </div>
               ))}
             </div>
             <div style={{
-              padding: '1rem',
-              backgroundColor: '#fffbeb',
-              borderRadius: '6px',
+              padding: '1.5rem',
+              background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+              borderRadius: '12px',
               border: '1px solid #fed7aa',
-              fontSize: '0.75rem',
+              fontSize: '0.9rem',
               color: '#92400e'
             }}>
-              💡 <strong>Try asking:</strong> "How do I use the subjunctive mood?" or "Explain conditional tense with examples"
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <span style={{ fontSize: '1.25rem' }}>💡</span>
+                <strong>Try asking me:</strong>
+              </div>
+              <div style={{ fontSize: '0.85rem', lineHeight: '1.5' }}>
+                "How do I use the subjunctive mood?" • "Explain conditional tense with examples" • "What's the difference between formal and informal imperatives?"
+              </div>
             </div>
           </div>
         )}

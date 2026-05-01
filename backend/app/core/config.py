@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # Database
-    DATABASE_URL: str = "postgresql://italian_user:italian_pass@postgres:5432/italian_tutor"
+    DATABASE_URL: str = "postgresql://amicolingua_user:amicolingua_pass@postgres:5432/amicolingua_db"
 
     # Vector DB
     QDRANT_URL: str = "http://qdrant:6333"

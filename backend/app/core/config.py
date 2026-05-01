@@ -31,9 +31,12 @@ class Settings(BaseSettings):
 
     # CORS
     CORS_ORIGINS: List[str] = [
-        "http://localhost:3335",
+        "http://localhost:3000",
+        "http://localhost:3335", 
         "http://localhost:8000",
+        "http://127.0.0.1:3000",
         "http://127.0.0.1:3335",
+        "http://127.0.0.1:8000",
     ]
     ALLOWED_HOSTS: List[str] = ["localhost", "127.0.0.1", "0.0.0.0"]
 

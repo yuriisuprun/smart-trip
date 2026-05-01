@@ -18,12 +18,29 @@ async def seed_comprehensive_content():
     """Seed comprehensive B1-B2 Italian grammar content (500+ rules)"""
     try:
         logger.info("Starting comprehensive content seeding...")
-        results = content_seeder.seed_comprehensive_grammar_content()
         
-        return {
-            "message": "Comprehensive Italian grammar content seeded successfully",
-            "results": results
-        }
+        # Check if we're using mock service
+        from app.services.rag import rag_service
+        
+        if hasattr(rag_service, 'mock_content'):
+            # Mock seeding - just return success
+            logger.info("Using mock RAG service - simulating content seeding")
+            return {
+                "message": "Comprehensive Italian grammar content seeded successfully (Mock Mode)",
+                "results": {
+                    "grammar_content": len(rag_service.mock_content),
+                    "exercises": 3,
+                    "total_documents": len(rag_service.mock_content) + 3,
+                    "errors": []
+                }
+            }
+        else:
+            # Use real content seeder
+            results = content_seeder.seed_comprehensive_grammar_content()
+            return {
+                "message": "Comprehensive Italian grammar content seeded successfully",
+                "results": results
+            }
     except Exception as e:
         logger.error(f"Error seeding comprehensive content: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -90,11 +107,46 @@ async def update_content_version(version: str):
 async def get_content_statistics():
     """Get statistics about the seeded content"""
     try:
-        stats = content_seeder.get_content_statistics()
-        return {
-            "message": "Content statistics retrieved successfully",
-            "statistics": stats
-        }
+        # Check if we're using mock service
+        from app.services.rag import rag_service
+        
+        if hasattr(rag_service, 'mock_content'):
+            # Return mock statistics
+            return {
+                "message": "Content statistics retrieved successfully (Mock Mode)",
+                "statistics": {
+                    "total_grammar_rules": len(rag_service.mock_content),
+                    "total_exercises": 3,  # Mock exercise count
+                    "total_documents": len(rag_service.mock_content) + 3,
+                    "content_version": "2.0.0-mock",
+                    "last_updated": "2024-04-29T18:00:00Z",
+                    "cefr_level_distribution": {
+                        "B1": {"grammar_rules": 4, "exercises": 2},
+                        "B2": {"grammar_rules": 1, "exercises": 1}
+                    },
+                    "topic_distribution": {
+                        "subjunctive_mood": {"grammar_rules": 1},
+                        "conditional_mood": {"grammar_rules": 1},
+                        "imperative_mood": {"grammar_rules": 1},
+                        "prepositions": {"grammar_rules": 1},
+                        "pronouns": {"grammar_rules": 1}
+                    },
+                    "available_topics": [
+                        "subjunctive_mood",
+                        "conditional_mood", 
+                        "imperative_mood",
+                        "prepositions",
+                        "pronouns"
+                    ]
+                }
+            }
+        else:
+            # Use real content seeder
+            stats = content_seeder.get_content_statistics()
+            return {
+                "message": "Content statistics retrieved successfully",
+                "statistics": stats
+            }
     except Exception as e:
         logger.error(f"Error getting content statistics: {e}")
         raise HTTPException(status_code=500, detail=str(e))

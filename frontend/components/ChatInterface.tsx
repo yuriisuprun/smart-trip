@@ -141,27 +141,75 @@ export default function ChatInterface() {
         alignItems: 'center',
         backgroundColor: '#f8fafc'
       }}>
-        <h3 style={{ margin: 0, color: '#1e293b', fontSize: '1.125rem', fontWeight: '600' }}>
-          Italian Grammar Tutor
-        </h3>
-        <button
-          onClick={() => setShowAdminPanel(true)}
-          style={{
-            padding: '0.5rem',
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
             backgroundColor: '#4f46e5',
-            color: 'white',
-            border: 'none',
             borderRadius: '6px',
-            cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.5rem',
-            fontSize: '0.875rem'
-          }}
-        >
-          <Settings size={16} />
-          Admin
-        </button>
+            justifyContent: 'center',
+            color: 'white',
+            fontWeight: 'bold',
+            fontSize: '12px'
+          }}>
+            IT
+          </div>
+          <div>
+            <h3 style={{ margin: 0, color: '#1e293b', fontSize: '1.125rem', fontWeight: '600' }}>
+              Italian Grammar Tutor
+            </h3>
+            <p style={{ margin: 0, color: '#64748b', fontSize: '0.75rem' }}>
+              Advanced B1-B2 Grammar Assistant
+            </p>
+          </div>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{
+            padding: '0.25rem 0.5rem',
+            backgroundColor: '#dbeafe',
+            borderRadius: '4px',
+            fontSize: '0.75rem',
+            color: '#1e40af',
+            fontWeight: '500'
+          }}>
+            500+ Grammar Rules
+          </div>
+          
+          <button
+            onClick={() => setShowAdminPanel(true)}
+            style={{
+              padding: '0.5rem 0.75rem',
+              backgroundColor: '#4f46e5',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              transition: 'all 0.2s',
+              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = '#4338ca'
+              e.currentTarget.style.transform = 'translateY(-1px)'
+              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.15)'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = '#4f46e5'
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.1)'
+            }}
+          >
+            <Settings size={16} />
+            Content Admin
+          </button>
+        </div>
       </div>
 
       {/* Messages */}
@@ -173,6 +221,70 @@ export default function ChatInterface() {
         flexDirection: 'column',
         gap: '1rem'
       }}>
+        {currentSession.messages.length === 0 && (
+          <div style={{
+            textAlign: 'center',
+            padding: '2rem',
+            backgroundColor: '#f8fafc',
+            borderRadius: '8px',
+            border: '1px solid #e2e8f0'
+          }}>
+            <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>🇮🇹</div>
+            <h3 style={{ 
+              margin: '0 0 1rem 0', 
+              color: '#1e293b', 
+              fontSize: '1.25rem', 
+              fontWeight: '600' 
+            }}>
+              Welcome to Advanced Italian Grammar
+            </h3>
+            <p style={{ 
+              margin: '0 0 1.5rem 0', 
+              color: '#64748b', 
+              fontSize: '0.875rem',
+              lineHeight: '1.5'
+            }}>
+              Ask me about B1-B2 level Italian grammar topics. I can help with:
+            </p>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '0.75rem',
+              marginBottom: '1.5rem'
+            }}>
+              {[
+                '🎯 Subjunctive Mood (Congiuntivo)',
+                '💬 Conditional Tense (Condizionale)', 
+                '📢 Imperative Commands (Imperativo)',
+                '🔗 Complex Prepositions',
+                '🎪 CI/NE Pronouns',
+                '🔄 Relative Pronouns'
+              ].map((topic, index) => (
+                <div key={index} style={{
+                  padding: '0.5rem',
+                  backgroundColor: 'white',
+                  borderRadius: '6px',
+                  border: '1px solid #e2e8f0',
+                  fontSize: '0.75rem',
+                  color: '#374151'
+                }}>
+                  {topic}
+                </div>
+              ))}
+            </div>
+            <div style={{
+              padding: '1rem',
+              backgroundColor: '#fffbeb',
+              borderRadius: '6px',
+              border: '1px solid #fed7aa',
+              fontSize: '0.75rem',
+              color: '#92400e'
+            }}>
+              💡 <strong>Try asking:</strong> "How do I use the subjunctive mood?" or "Explain conditional tense with examples"
+            </div>
+          </div>
+        )}
+        
         {currentSession.messages.map((message) => (
           <div
             key={message.id}

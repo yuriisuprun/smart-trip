@@ -8,7 +8,6 @@ import ChatInterface from '@/components/ChatInterface'
 import ProgressDashboard from '@/components/ProgressDashboard'
 import QuizInterface from '@/components/QuizInterface'
 import LanguageSelector from '@/components/LanguageSelector'
-import SimpleAdminTest from '@/components/SimpleAdminTest'
 import { BookOpen, BarChart3, HelpCircle, Plus, User } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -121,6 +120,38 @@ export default function Home() {
             <LanguageSelector />
             
             <SignedIn>
+              <a
+                href="/admin-test"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.5rem 1rem',
+                  backgroundColor: '#f1f5f9',
+                  borderRadius: '6px',
+                  textDecoration: 'none',
+                  color: '#64748b',
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                  transition: 'all 0.2s',
+                  border: '1px solid #e2e8f0'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = '#e2e8f0'
+                  e.currentTarget.style.color = '#4f46e5'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f1f5f9'
+                  e.currentTarget.style.color = '#64748b'
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 20h9"/>
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                </svg>
+                Admin Panel
+              </a>
+              
               <a
                 href="/profile"
                 style={{
@@ -239,7 +270,6 @@ export default function Home() {
       </SignedOut>
 
       <SignedIn>
-        <SimpleAdminTest />
         <div style={{ 
           maxWidth: '1200px', 
           margin: '0 auto', 

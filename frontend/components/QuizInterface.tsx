@@ -142,11 +142,7 @@ export default function QuizInterface() {
   }
 
   return (
-    <div style={{ 
-      maxWidth: '48rem', 
-      margin: '0 auto', 
-      padding: '1.5rem' 
-    }}>
+    <div style={{maxWidth: '48rem', margin: '0 auto', padding: '1.5rem'}}>
       <div style={{ marginBottom: '1.5rem' }}>
         <div style={{
           backgroundColor: '#f8fafc',

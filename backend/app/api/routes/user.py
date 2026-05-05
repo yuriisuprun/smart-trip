@@ -68,11 +68,8 @@ async def get_user_profile(
 
 
 @router.put("/profile", response_model=UserProfileSchema)
-async def update_user_profile(
-    profile_update: UpdateProfileSchema,
-    db: Session = Depends(get_db),
-    current_user_id: str = Depends(get_current_user_id),
-):
+async def update_user_profile(profile_update: UpdateProfileSchema, db: Session = Depends(get_db),
+                              current_user_id: str = Depends(get_current_user_id), ):
     """Update current user's profile"""
     try:
         user = db.query(User).filter(User.id == current_user_id).first()
